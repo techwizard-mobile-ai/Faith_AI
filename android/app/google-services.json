@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "35240612401",
+    "project_id": "my-friend-faith-fcaf1",
+    "storage_bucket": "my-friend-faith-fcaf1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35240612401:android:3170dcf27efe72fb3a3b10",
+        "android_client_info": {
+          "package_name": "com.example.faith_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBLdHb9cpmI-14LS9okWK48ITA9K5M39w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

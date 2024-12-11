@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "my-friend-faith-fcaf1",
+          "appId": "1:35240612401:android:3170dcf27efe72fb3a3b10",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "my-friend-faith-fcaf1",
+          "configurations": {
+            "android": "1:35240612401:android:3170dcf27efe72fb3a3b10",
+            "ios": "1:35240612401:ios:3d58543e2c37b51a3a3b10",
+            "macos": "1:35240612401:ios:3d58543e2c37b51a3a3b10",
+            "web": "1:35240612401:web:1da583a8409c98593a3b10",
+            "windows": "1:35240612401:web:b35e520c866724963a3b10"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "singleProjectMode": true
+  }
+}
