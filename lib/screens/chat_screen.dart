@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, library_private_types_in_public_api, use_super_parameters
 
 import 'package:auto_route/auto_route.dart';
-import 'package:faith_mobile/core/routes/app_route.gr.dart';
-import 'package:faith_mobile/widgets/chat_item.dart';
-import 'package:faith_mobile/widgets/hamburger_menu.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart';
+import 'package:myfriendfaith/widgets/chat_item.dart';
+import 'package:myfriendfaith/widgets/hamburger_menu.dart';
 import 'package:flutter/material.dart';
 
 @RoutePage()

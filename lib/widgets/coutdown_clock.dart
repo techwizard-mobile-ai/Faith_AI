@@ -1,6 +1,6 @@
 // ignore_for_file: use_full_hex_values_for_flutter_colors, prefer_const_constructors
 
-import 'package:faith_mobile/widgets/custom_circularprogress.dart';
+import 'package:myfriendfaith/widgets/custom_circularprogress.dart';
 import 'package:flutter/material.dart';
 
 class CountdownClock extends StatefulWidget {

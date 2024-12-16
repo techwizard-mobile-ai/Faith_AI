@@ -1,6 +1,6 @@
 {
-    "name": "faith_mobile",
-    "short_name": "faith_mobile",
+    "name": "myfriendfaith",
+    "short_name": "myfriendfaith",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

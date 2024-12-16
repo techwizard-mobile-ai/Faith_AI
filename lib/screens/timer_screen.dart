@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, library_private_types_in_public_api, sort_child_properties_last
 
 import 'package:auto_route/auto_route.dart';
-import 'package:faith_mobile/core/routes/app_route.gr.dart';
-import 'package:faith_mobile/widgets/coutdown_clock.dart';
-import 'package:faith_mobile/widgets/hamburger_menu.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart';
+import 'package:myfriendfaith/widgets/coutdown_clock.dart';
+import 'package:myfriendfaith/widgets/hamburger_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

@@ -1,4 +1,4 @@
-package com.example.faith_mobile
+package com.example.myfriendfaith
 
 import io.flutter.embedding.android.FlutterActivity
 

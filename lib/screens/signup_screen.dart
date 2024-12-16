@@ -1,11 +1,13 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last, prefer_const_literals_to_create_immutables
 
 import 'package:auto_route/auto_route.dart';
-import 'package:faith_mobile/core/routes/app_route.gr.dart';
-import 'package:faith_mobile/widgets/inputForm_item.dart';
-import 'package:faith_mobile/widgets/social_icon_button.dart';
+import 'package:myfriendfaith/core/auth/social_Sign.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart';
+import 'package:myfriendfaith/widgets/inputForm_item.dart';
+import 'package:myfriendfaith/widgets/social_icon_button.dart';
 import 'package:flutter/material.dart';
-import 'package:faith_mobile/core/auth/signUp.dart';
+import 'package:myfriendfaith/core/auth/signUp.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 @RoutePage()
 class SignupSceen extends StatefulWidget {
@@ -20,8 +22,19 @@ class _SignupSceenState extends State<SignupSceen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   bool _isChecked = false;
+  bool _isLoading = false;
 
-  String? _errorMessage;
+  Future<void> _initPreferences() async {
+    var box = await Hive.openBox('myBox');
+    box.clear();
+    await box.put('verificationCode', null);
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _initPreferences();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,12 +236,19 @@ class _SignupSceenState extends State<SignupSceen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       SocialIconButton(
+                                        onPressed: () {
+                                          signInWithGoogle(context);
+                                        },
                                         iconUrl: 'assets/icons/google-icon.png',
                                       ),
                                       SocialIconButton(
+                                          onPressed: () {
+                                            signInWithApple();
+                                          },
                                           iconUrl:
                                               'assets/icons/apple-icon.png'),
                                       SocialIconButton(
+                                          onPressed: () {},
                                           iconUrl:
                                               'assets/icons/facebook-icon.png')
                                     ],
@@ -243,22 +263,37 @@ class _SignupSceenState extends State<SignupSceen> {
                                   Expanded(
                                     child: TextButton(
                                       onPressed: this._isChecked
-                                          ? () {
-                                              signUpUser(_emailController.text,
-                                                  _passwordController.text);
+                                          ? () async {
+                                              setState(() {
+                                                _isLoading = true;
+                                              });
+                                              bool temp = await signUpUser(
+                                                  _emailController.text,
+                                                  _passwordController.text,
+                                                  _nameController.text,
+                                                  context);
+                                              setState(() {
+                                                _isLoading = false;
+                                              });
                                             }
                                           : null,
                                       child: SizedBox(
                                         height: 40,
                                         child: Center(
-                                          child: Text('Create Account',
-                                              style: TextStyle(
+                                          child: this._isLoading
+                                              ? CircularProgressIndicator(
                                                   color: Colors.white,
-                                                  fontSize: 14,
-                                                  decoration:
-                                                      TextDecoration.none,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontFamily: 'Georgia')),
+                                                  strokeWidth: 5,
+                                                )
+                                              : Text('Create Account',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      decoration:
+                                                          TextDecoration.none,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontFamily: 'Georgia')),
                                         ),
                                       ),
                                       style: TextButton.styleFrom(

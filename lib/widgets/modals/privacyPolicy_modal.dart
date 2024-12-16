@@ -4,7 +4,7 @@ import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:faith_mobile/utils/pop.dart';
+import 'package:myfriendfaith/utils/pop.dart';
 
 @RoutePage()
 class PrivacyPolicyModal extends StatefulWidget {

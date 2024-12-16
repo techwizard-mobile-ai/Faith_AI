@@ -2,7 +2,7 @@
 
 import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
-import "package:faith_mobile/core/routes/app_route.gr.dart";
+import "package:myfriendfaith/core/routes/app_route.gr.dart";
 
 class HamburgerMenu extends StatefulWidget {
   const HamburgerMenu({super.key});
@@ -29,7 +29,7 @@ class _HamburgerMenuState extends State<HamburgerMenu> {
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10), bottomLeft: Radius.circular(10))),
       constraints: BoxConstraints(
-        maxHeight: 200,
+        maxHeight: 240,
       ),
       child: Column(
         children: [

@@ -1,4 +1,4 @@
-# faith_mobile
+# myfriendfaith
 
 A new Flutter project.
 

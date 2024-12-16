@@ -9,23 +9,26 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i18;
-import 'package:faith_mobile/screens/call_screen.dart' as _i2;
-import 'package:faith_mobile/screens/chat_screen.dart' as _i3;
-import 'package:faith_mobile/screens/dashboard_screen.dart' as _i4;
-import 'package:faith_mobile/screens/growthjournal_screen.dart' as _i5;
-import 'package:faith_mobile/screens/journal_screen.dart' as _i6;
-import 'package:faith_mobile/screens/landing_screen.dart' as _i7;
-import 'package:faith_mobile/screens/login_screen.dart' as _i8;
-import 'package:faith_mobile/screens/settings_screen.dart' as _i12;
-import 'package:faith_mobile/screens/signup_screen.dart' as _i13;
-import 'package:faith_mobile/screens/swipper_screen.dart' as _i14;
-import 'package:faith_mobile/screens/timer_screen.dart' as _i15;
-import 'package:faith_mobile/widgets/modals/about_modal.dart' as _i1;
-import 'package:faith_mobile/widgets/modals/prayerExperience_modal.dart' as _i9;
-import 'package:faith_mobile/widgets/modals/privacyPolicy_modal.dart' as _i10;
-import 'package:faith_mobile/widgets/modals/profile_modal.dart' as _i11;
-import 'package:faith_mobile/widgets/modals/tos_modal.dart' as _i16;
-import 'package:faith_mobile/widgets/modals/voicePreference_modal.dart' as _i17;
+import 'package:myfriendfaith/screens/call_screen.dart' as _i2;
+import 'package:myfriendfaith/screens/chat_screen.dart' as _i3;
+import 'package:myfriendfaith/screens/dashboard_screen.dart' as _i4;
+import 'package:myfriendfaith/screens/growthjournal_screen.dart' as _i5;
+import 'package:myfriendfaith/screens/journal_screen.dart' as _i6;
+import 'package:myfriendfaith/screens/landing_screen.dart' as _i7;
+import 'package:myfriendfaith/screens/login_screen.dart' as _i8;
+import 'package:myfriendfaith/screens/settings_screen.dart' as _i12;
+import 'package:myfriendfaith/screens/signup_screen.dart' as _i13;
+import 'package:myfriendfaith/screens/swipper_screen.dart' as _i14;
+import 'package:myfriendfaith/screens/timer_screen.dart' as _i15;
+import 'package:myfriendfaith/widgets/modals/about_modal.dart' as _i1;
+import 'package:myfriendfaith/widgets/modals/prayerExperience_modal.dart'
+    as _i9;
+import 'package:myfriendfaith/widgets/modals/privacyPolicy_modal.dart' as _i10;
+import 'package:myfriendfaith/widgets/modals/profile_modal.dart' as _i11;
+import 'package:myfriendfaith/widgets/modals/tos_modal.dart' as _i16;
+import 'package:myfriendfaith/widgets/modals/voicePreference_modal.dart'
+    as _i17;
+import 'package:flutter/material.dart' as _i19;
 
 abstract class $AppRouter extends _i18.RootStackRouter {
   $AppRouter({super.navigatorKey});
@@ -51,9 +54,13 @@ abstract class $AppRouter extends _i18.RootStackRouter {
       );
     },
     DashboardScreen.name: (routeData) {
+      final args = routeData.argsAs<DashboardScreenArgs>();
       return _i18.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i4.DashboardScreen(),
+        child: _i4.DashboardScreen(
+          key: args.key,
+          displayName: args.displayName,
+        ),
       );
     },
     GrowthjournalScreen.name: (routeData) {
@@ -181,16 +188,40 @@ class ChatScreen extends _i18.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.DashboardScreen]
-class DashboardScreen extends _i18.PageRouteInfo<void> {
-  const DashboardScreen({List<_i18.PageRouteInfo>? children})
-      : super(
+class DashboardScreen extends _i18.PageRouteInfo<DashboardScreenArgs> {
+  DashboardScreen({
+    _i19.Key? key,
+    required String? displayName,
+    List<_i18.PageRouteInfo>? children,
+  }) : super(
           DashboardScreen.name,
+          args: DashboardScreenArgs(
+            key: key,
+            displayName: displayName,
+          ),
           initialChildren: children,
         );
 
   static const String name = 'DashboardScreen';
 
-  static const _i18.PageInfo<void> page = _i18.PageInfo<void>(name);
+  static const _i18.PageInfo<DashboardScreenArgs> page =
+      _i18.PageInfo<DashboardScreenArgs>(name);
+}
+
+class DashboardScreenArgs {
+  const DashboardScreenArgs({
+    this.key,
+    required this.displayName,
+  });
+
+  final _i19.Key? key;
+
+  final String? displayName;
+
+  @override
+  String toString() {
+    return 'DashboardScreenArgs{key: $key, displayName: $displayName}';
+  }
 }
 
 /// generated route for

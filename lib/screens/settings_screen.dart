@@ -1,14 +1,14 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, library_private_types_in_public_api, use_super_parameters, prefer_const_literals_to_create_immutables
 
 import 'package:auto_route/auto_route.dart';
-import 'package:faith_mobile/widgets/hamburger_menu.dart';
-import 'package:faith_mobile/widgets/modals/prayerExperience_modal.dart';
-import 'package:faith_mobile/widgets/modals/privacyPolicy_modal.dart';
-import 'package:faith_mobile/widgets/modals/profile_modal.dart';
-import 'package:faith_mobile/widgets/modals/voicePreference_modal.dart';
-import 'package:faith_mobile/widgets/modals/tos_modal.dart';
+import 'package:myfriendfaith/widgets/hamburger_menu.dart';
+import 'package:myfriendfaith/widgets/modals/prayerExperience_modal.dart';
+import 'package:myfriendfaith/widgets/modals/privacyPolicy_modal.dart';
+import 'package:myfriendfaith/widgets/modals/profile_modal.dart';
+import 'package:myfriendfaith/widgets/modals/voicePreference_modal.dart';
+import 'package:myfriendfaith/widgets/modals/tos_modal.dart';
 import 'package:flutter/material.dart';
-import 'package:faith_mobile/widgets/modals/about_modal.dart';
+import 'package:myfriendfaith/widgets/modals/about_modal.dart';
 
 @RoutePage()
 class SettingsScreen extends StatefulWidget {

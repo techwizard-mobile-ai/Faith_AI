@@ -3,8 +3,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SocialIconButton extends StatefulWidget {
+  final Function() onPressed;
   final String iconUrl;
-  const SocialIconButton({Key? key, required this.iconUrl}) : super(key: key);
+  const SocialIconButton(
+      {Key? key, required this.onPressed, required this.iconUrl})
+      : super(key: key);
 
   @override
   _SocialIconButtonState createState() => _SocialIconButtonState();
@@ -19,7 +22,9 @@ class _SocialIconButtonState extends State<SocialIconButton> {
           height: 25,
           width: 25,
         ),
-        onPressed: () {},
+        onPressed: () {
+          widget.onPressed();
+        },
         style: IconButton.styleFrom(
             backgroundColor: Colors.transparent,
             padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),

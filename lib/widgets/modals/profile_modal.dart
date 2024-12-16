@@ -1,8 +1,16 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, library_private_types_in_public_api, use_super_parameters, prefer_const_literals_to_create_immutables
 
 import 'package:auto_route/auto_route.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:myfriendfaith/core/auth/delete.dart';
+import 'package:myfriendfaith/core/auth/signOut.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart';
 import 'package:flutter/material.dart';
-import 'package:faith_mobile/widgets/modals/about_modal.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myfriendfaith/core/storage/avatars.dart';
+import 'dart:io';
+
+import 'package:myfriendfaith/widgets/snackbars/state_snackbar.dart';
 
 @RoutePage()
 class ProfileModal extends StatefulWidget {
@@ -13,6 +21,85 @@ class ProfileModal extends StatefulWidget {
 }
 
 class _ProfileModalState extends State<ProfileModal> {
+  User? user;
+  bool isEditing = false;
+  File? imageFile;
+  final ImagePicker _picker = ImagePicker();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+//For Saving the Edit Result
+//Users can click the Edit Button
+//Theb they can be able to edit the display name and email , password and photos.
+  void handleEdit_Save() {
+    if (!this.isEditing) {
+      setState(() {
+        this.isEditing = true;
+      });
+      return;
+    } else {
+      updateProfile(context);
+    }
+  }
+
+//Here is for the update chnages
+
+//Upload Profile image and update the photoURL of the firebase authentication
+  Future<void> updateProfile(BuildContext context) async {
+    String? imageURL;
+
+    if (imageFile != null && user != null) {
+      imageURL = await uploadAvatar(imageFile, user?.uid ?? '');
+      if (imageURL != null) {
+        user?.updatePhotoURL(imageURL);
+        showStateSnackBar(context, 'Profile Image Uploaded', 'success');
+      } else {
+        showStateSnackBar(context, 'Profile Image Upload Failed', 'error');
+      }
+      await user?.updateDisplayName(_nameController.text);
+      await user?.updatePassword(_passwordController.text);
+      await user?.reload();
+      showStateSnackBar(context, 'Profile Upldated SuccessFully', 'success');
+    }
+  }
+
+//For the Image Picker from the gallery of from the camera
+  Future<void> pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+//This is for the when the user who is logged in or not logged in
+//If the user is not logged in, the user will be redirected to the login screen for the signin
+//If the user is logged in, the user will be redirected to the home screen after logged out
+  void handleSignIn_Out(BuildContext context) {
+    if (user == null) {
+      context.router.push(LoginScreen());
+      return;
+    }
+    signOut(context);
+  }
+
+//This is for deleting the user account
+  void handleDeleteAccount(BuildContext context) {
+    deleteAccount(context);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _nameController.text = user!.displayName!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,8 +139,12 @@ class _ProfileModalState extends State<ProfileModal> {
                           Row(
                             children: [
                               IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.check),
+                                  onPressed: () {
+                                    setState(() => {this.isEditing = true});
+                                  },
+                                  icon: Icon(this.isEditing
+                                      ? Icons.check
+                                      : Icons.edit_note_rounded),
                                   style: ButtonStyle(
                                     backgroundColor: WidgetStateProperty.all(
                                         Colors.transparent),
@@ -105,40 +196,49 @@ class _ProfileModalState extends State<ProfileModal> {
                               child: Row(
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.only(right: 10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Image.asset(
-                                      'assets/icons/google-icon.png',
-                                      height: 55,
-                                      width: 55,
-                                    ),
-                                  ),
+                                      width: 45,
+                                      height: 45,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: user?.photoURL != null
+                                          ? ClipOval(
+                                              child: Image(
+                                                image: NetworkImage(
+                                                    user!.photoURL!),
+                                              ),
+                                            )
+                                          : Icon(
+                                              Icons.account_circle,
+                                              color: Colors.white,
+                                              size: 50,
+                                            )),
                                   Expanded(
                                       child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Upload Customized Avatar',
-                                        style: TextStyle(
-                                            color:
-                                                Colors.white.withOpacity(0.8),
-                                            fontFamily: 'Georgia',
-                                            height: 1.741,
-                                            fontSize: 14),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          user?.email ?? "Faith",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                       )
                                     ],
                                   )),
-                                  IconButton(
-                                      onPressed: () {},
-                                      iconSize: 22,
-                                      icon: Icon(
-                                        Icons.file_upload_outlined,
-                                        color: Colors.white.withOpacity(0.8),
-                                      ))
+                                  this.isEditing
+                                      ? IconButton(
+                                          onPressed: () {
+                                            pickImage();
+                                          },
+                                          iconSize: 22,
+                                          icon: Icon(
+                                            Icons.upload,
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                          ))
+                                      : SizedBox.shrink()
                                 ],
                               ),
                             ),
@@ -168,8 +268,10 @@ class _ProfileModalState extends State<ProfileModal> {
                                             width: 1),
                                       )),
                                       child: TextField(
+                                          controller: _nameController,
                                           style: TextStyle(color: Colors.white),
                                           cursorColor: Colors.white,
+                                          enabled: this.isEditing,
                                           decoration: InputDecoration(
                                             contentPadding:
                                                 EdgeInsets.symmetric(
@@ -192,13 +294,16 @@ class _ProfileModalState extends State<ProfileModal> {
                                             width: 1),
                                       )),
                                       child: TextField(
+                                          controller: _passwordController,
                                           style: TextStyle(color: Colors.white),
+                                          enabled: this.isEditing,
                                           cursorColor: Colors.white,
+                                          obscureText: true,
                                           decoration: InputDecoration(
                                             contentPadding:
                                                 EdgeInsets.symmetric(
                                                     horizontal: 10),
-                                            hintText: 'Email',
+                                            hintText: 'New Password',
                                             hintStyle: TextStyle(
                                                 color: Colors.white
                                                     .withOpacity(0.8),
@@ -207,70 +312,71 @@ class _ProfileModalState extends State<ProfileModal> {
                                                 fontSize: 14),
                                             border: InputBorder.none,
                                           ))),
-                                  Container(
-                                      decoration: BoxDecoration(
-                                          border: Border(
-                                        bottom: BorderSide(
-                                            color:
-                                                Colors.white.withOpacity(0.3),
-                                            width: 1),
-                                      )),
-                                      child: TextField(
-                                          style: TextStyle(color: Colors.white),
-                                          cursorColor: Colors.white,
-                                          decoration: InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                            hintText: 'Password',
-                                            hintStyle: TextStyle(
-                                                color: Colors.white
-                                                    .withOpacity(0.8),
-                                                fontFamily: 'Georgia',
-                                                height: 1.741,
-                                                fontSize: 14),
-                                            border: InputBorder.none,
-                                          ))),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Checkbox(
-                                        value: true,
-                                        onChanged: (bool? value) {},
-                                        activeColor:
-                                            Colors.white.withOpacity(0.3),
-                                        checkColor: Colors.white,
-                                        side: BorderSide(
-                                            color:
-                                                Colors.white.withOpacity(0.3),
-                                            width: 2),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5))),
-                                      ),
-                                      TextButton(
-                                          onPressed: () {},
-                                          child: Text(
-                                            'I am Christian',
-                                            style: TextStyle(
-                                              color:
-                                                  Colors.white.withOpacity(0.7),
-                                              fontFamily: 'Georgia',
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14,
-                                            ),
-                                          ))
-                                    ],
-                                  ),
                                 ],
                               ),
                             ),
                           ),
                         ],
                       ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Container(
+                            margin: EdgeInsets.only(top: 12),
+                            child: TextButton(
+                              onPressed: () {
+                                handleDeleteAccount(context);
+                              },
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(vertical: 13),
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.1),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10))),
+                              child: Text(
+                                'Delete My Account',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Georgia',
+                                    height: 1.741,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          )),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: Container(
+                            margin: EdgeInsets.only(top: 12),
+                            child: TextButton(
+                              onPressed: () {
+                                handleSignIn_Out(context);
+                              },
+                              style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(vertical: 13),
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.1),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10))),
+                              child: Text(
+                                this.user == null ? 'Log In' : 'Log Out',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Georgia',
+                                    height: 1.741,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          )),
+                        ],
+                      )
                     ],
                   ),
-                ))
+                )),
               ],
             )
           ],

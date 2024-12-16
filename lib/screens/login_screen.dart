@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last, prefer_const_literals_to_create_immutables
 
 import 'package:auto_route/auto_route.dart';
-import 'package:faith_mobile/core/routes/app_route.gr.dart';
-import 'package:faith_mobile/widgets/inputForm_item.dart';
-import 'package:faith_mobile/widgets/social_icon_button.dart';
+import 'package:myfriendfaith/core/auth/signIn.dart';
+import 'package:myfriendfaith/core/auth/social_Sign.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart';
+import 'package:myfriendfaith/widgets/inputForm_item.dart';
+import 'package:myfriendfaith/widgets/social_icon_button.dart';
 import 'package:flutter/material.dart';
 
 @RoutePage()
@@ -17,6 +19,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool progressLogin = false;
+
+  //Handle Click the Login Button
+  Future<void> _handleLogin(BuildContext context) async {
+    await SiginInWithEmail(
+        _emailController.text, _passwordController.text, context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,12 +197,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       SocialIconButton(
+                                        onPressed: () async {
+                                          if (progressLogin) return;
+                                          setState(() {
+                                            progressLogin = true;
+                                          });
+                                          await signInWithGoogle(context);
+                                          setState(() {
+                                            progressLogin = false;
+                                          });
+                                        },
                                         iconUrl: 'assets/icons/google-icon.png',
                                       ),
                                       SocialIconButton(
+                                          onPressed: () {},
                                           iconUrl:
                                               'assets/icons/apple-icon.png'),
                                       SocialIconButton(
+                                          onPressed: () {},
                                           iconUrl:
                                               'assets/icons/facebook-icon.png')
                                     ],
@@ -213,19 +234,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Expanded(
                           child: TextButton(
-                            onPressed: () {},
-                            child: SizedBox(
-                              height: 40,
-                              child: Center(
-                                child: Text('Login',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        decoration: TextDecoration.none,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Georgia')),
-                              ),
-                            ),
+                            onPressed: progressLogin
+                                ? null
+                                : () {
+                                    _handleLogin(context);
+                                  },
+                            child: progressLogin
+                                ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : SizedBox(
+                                    height: 40,
+                                    child: Center(
+                                      child: Text('Login',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              decoration: TextDecoration.none,
+                                              fontWeight: FontWeight.w700,
+                                              fontFamily: 'Georgia')),
+                                    ),
+                                  ),
                             style: TextButton.styleFrom(
                               backgroundColor: Color(0x1AFFFFFF),
                               shape: RoundedRectangleBorder(
@@ -252,10 +281,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: 'Georgia')),
                         TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              context.router.push(SignupSceen());
-                            },
+                            onPressed: progressLogin
+                                ? null
+                                : () {
+                                    Navigator.pop(context);
+                                    context.router.push(SignupSceen());
+                                  },
                             child: Text('Sign Up',
                                 style: TextStyle(
                                     color: Colors.white,

@@ -2,7 +2,7 @@
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:faith_mobile/core/routes/app_route.gr.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart';
 
 @RoutePage()
 class LandingScreen extends StatelessWidget {

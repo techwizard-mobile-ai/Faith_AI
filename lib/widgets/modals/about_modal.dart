@@ -2,7 +2,7 @@
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:faith_mobile/widgets/modals/about_modal.dart';
+import 'package:myfriendfaith/widgets/modals/about_modal.dart';
 
 @RoutePage()
 class AboutModal extends StatefulWidget {
