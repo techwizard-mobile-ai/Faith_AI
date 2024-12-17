@@ -48,7 +48,9 @@ class _ProfileModalState extends State<ProfileModal> {
   Future<void> updateProfile(BuildContext context) async {
     String? imageURL;
 
+    print("ONE");
     if (imageFile != null && user != null) {
+      print("Image One");
       imageURL = await uploadAvatar(imageFile, user?.uid ?? '');
       if (imageURL != null) {
         user?.updatePhotoURL(imageURL);
@@ -56,11 +58,21 @@ class _ProfileModalState extends State<ProfileModal> {
       } else {
         showStateSnackBar(context, 'Profile Image Upload Failed', 'error');
       }
+    }
+    if (user != null) {
+      print("DisplayName");
       await user?.updateDisplayName(_nameController.text);
-      await user?.updatePassword(_passwordController.text);
+      if (_passwordController.text.isNotEmpty) {
+        print("Password");
+        await user?.updatePassword(_passwordController.text);
+      }
       await user?.reload();
       showStateSnackBar(context, 'Profile Upldated SuccessFully', 'success');
     }
+
+    setState(() {
+      this.isEditing = false;
+    });
   }
 
 //For the Image Picker from the gallery of from the camera
@@ -140,7 +152,7 @@ class _ProfileModalState extends State<ProfileModal> {
                             children: [
                               IconButton(
                                   onPressed: () {
-                                    setState(() => {this.isEditing = true});
+                                    handleEdit_Save();
                                   },
                                   icon: Icon(this.isEditing
                                       ? Icons.check
@@ -203,10 +215,13 @@ class _ProfileModalState extends State<ProfileModal> {
                                       ),
                                       child: user?.photoURL != null
                                           ? ClipOval(
-                                              child: Image(
-                                                image: NetworkImage(
-                                                    user!.photoURL!),
-                                              ),
+                                              child: this.imageFile == null
+                                                  ? Image(
+                                                      image: NetworkImage(
+                                                          user!.photoURL!),
+                                                    )
+                                                  : Image.file(
+                                                      File(imageFile!.path)),
                                             )
                                           : Icon(
                                               Icons.account_circle,

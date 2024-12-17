@@ -3,8 +3,10 @@
 import 'dart:ui';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:myfriendfaith/core/auth/settings.dart';
 
 @RoutePage()
 class PrayerExperienceModal extends StatefulWidget {
@@ -16,15 +18,48 @@ class PrayerExperienceModal extends StatefulWidget {
 
 class _PrayerExperienceModalState extends State<PrayerExperienceModal> {
   bool openModal = false;
+  bool isEditing = false;
   String? _selectedPath;
+  final User? user = FirebaseAuth.instance.currentUser;
   final TextEditingController _openingController = TextEditingController();
   final TextEditingController _closingController = TextEditingController();
+
+  //Handle Click the Eidt and Save Button
+  Future<void> handleEditSave() async {
+    if (!this.isEditing) {
+      setState(() {
+        isEditing = true;
+      });
+    } else {
+      await editPrayerExperience(context, _selectedPath,
+          _openingController.text, _closingController.text);
+      setState(
+        () {
+          isEditing = false;
+        },
+      );
+    }
+  }
+
+  //Read data from the firestore
+  Future<void> _getFirestoreData() async {
+    Map<String, dynamic>? prayerExperience = await readPrayerExperience();
+    if (prayerExperience == null) {
+      return;
+    }
+    _openingController.text = prayerExperience['open'] ?? "Dear God";
+    _closingController.text = prayerExperience['close'] ?? "Amen";
+    setState(() {
+      _selectedPath = prayerExperience['path'] == null
+          ? "Choose Path"
+          : prayerExperience['path'];
+    });
+  }
 
   @override
   initState() {
     super.initState();
-    _openingController.text = "Dear God";
-    _closingController.text = "Amen";
+    _getFirestoreData();
   }
 
   @override
@@ -65,15 +100,23 @@ class _PrayerExperienceModalState extends State<PrayerExperienceModal> {
                           ),
                           Row(
                             children: [
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.check),
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                        Colors.transparent),
-                                    foregroundColor:
-                                        WidgetStateProperty.all(Colors.white),
-                                  )),
+                              this.user == null
+                                  ? SizedBox.shrink()
+                                  : IconButton(
+                                      onPressed: () {
+                                        handleEditSave();
+                                      },
+                                      icon: this.isEditing
+                                          ? Icon(Icons.check)
+                                          : Icon(Icons.edit_note_rounded),
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            WidgetStateProperty.all(
+                                                Colors.transparent),
+                                        foregroundColor:
+                                            WidgetStateProperty.all(
+                                                Colors.white),
+                                      )),
                             ],
                           ),
                         ],
@@ -129,11 +172,13 @@ class _PrayerExperienceModalState extends State<PrayerExperienceModal> {
                                           width: 1),
                                     )),
                                     child: TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            openModal = true;
-                                          });
-                                        },
+                                        onPressed: this.isEditing
+                                            ? () {
+                                                setState(() {
+                                                  openModal = true;
+                                                });
+                                              }
+                                            : null,
                                         style: TextButton.styleFrom(
                                             padding: EdgeInsets.only(
                                                 top: 0,
@@ -177,6 +222,7 @@ class _PrayerExperienceModalState extends State<PrayerExperienceModal> {
                                             width: 1),
                                       )),
                                       child: TextField(
+                                          enabled: this.isEditing,
                                           controller: _openingController,
                                           style: TextStyle(color: Colors.white),
                                           cursorColor: Colors.white,
@@ -195,6 +241,7 @@ class _PrayerExperienceModalState extends State<PrayerExperienceModal> {
                                           ))),
                                   Container(
                                       child: TextField(
+                                          enabled: this.isEditing,
                                           controller: _closingController,
                                           style: TextStyle(color: Colors.white),
                                           cursorColor: Colors.white,

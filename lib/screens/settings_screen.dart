@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers, library_private_types_in_public_api, use_super_parameters, prefer_const_literals_to_create_immutables
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/widgets.dart';
+import 'package:myfriendfaith/core/routes/app_route.gr.dart' show LoginScreen;
 import 'package:myfriendfaith/widgets/hamburger_menu.dart';
 import 'package:myfriendfaith/widgets/modals/prayerExperience_modal.dart';
 import 'package:myfriendfaith/widgets/modals/privacyPolicy_modal.dart';
@@ -9,6 +11,7 @@ import 'package:myfriendfaith/widgets/modals/voicePreference_modal.dart';
 import 'package:myfriendfaith/widgets/modals/tos_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:myfriendfaith/widgets/modals/about_modal.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 @RoutePage()
 class SettingsScreen extends StatefulWidget {
@@ -19,6 +22,17 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final User? user = FirebaseAuth.instance.currentUser;
+  String? profileImage;
+  bool isEditing = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    profileImage = user?.photoURL;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,14 +85,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     Container(
                                       margin: EdgeInsets.only(right: 10),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Image.asset(
-                                        'assets/icons/google-icon.png',
-                                        height: 55,
-                                        width: 55,
-                                      ),
+                                      child: profileImage == null
+                                          ? Icon(
+                                              Icons.account_circle_outlined,
+                                              size: 55,
+                                              color: Colors.white,
+                                            )
+                                          : ClipOval(
+                                              child: Image(
+                                                  image: NetworkImage(
+                                                      profileImage!),
+                                                  height: 55,
+                                                  width: 55),
+                                            ),
                                     ),
                                     Expanded(
                                         child: Column(
@@ -86,7 +107,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Helena Greene',
+                                          user != null
+                                              ? user!.displayName!
+                                              : 'My Friend Faith',
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -95,7 +118,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               fontSize: 14),
                                         ),
                                         Text(
-                                          'helena.greene@gmail.com',
+                                          user != null
+                                              ? user!.email!
+                                              : 'helena.greene@gmail.com',
                                           style: TextStyle(
                                               color:
                                                   Colors.white.withOpacity(0.8),
@@ -106,12 +131,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ],
                                     )),
                                     IconButton(
-                                        onPressed: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  ProfileModal());
-                                        },
+                                        onPressed: this.user == null
+                                            ? () {
+                                                context.router
+                                                    .push(LoginScreen());
+                                              }
+                                            : () {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        ProfileModal());
+                                              },
                                         iconSize: 17,
                                         icon: Icon(
                                           Icons.arrow_forward_ios_rounded,

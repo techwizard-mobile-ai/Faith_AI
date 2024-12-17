@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class ChatItem extends StatelessWidget {
   final bool isBot;
-  final List<String> messages;
+  final List<dynamic> messages;
   const ChatItem({Key? key, required this.isBot, required this.messages})
       : super(key: key);
 
@@ -15,7 +15,9 @@ class ChatItem extends StatelessWidget {
         Row(
           mainAxisAlignment:
               isBot ? MainAxisAlignment.start : MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: messages.length == 1
+              ? CrossAxisAlignment.center
+              : CrossAxisAlignment.start,
           children: [
             isBot
                 ? Column(
@@ -61,7 +63,7 @@ class ChatItem extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'I’ve been feeling a bit lost lately. I’m not sure what direction to take in life',
+                      msg,
                       style: TextStyle(
                         fontSize: 14,
                         color: Color(0xFFFFFFFF),
