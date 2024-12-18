@@ -1,98 +1,3 @@
-// import 'package:auto_route/auto_route.dart';
-// import 'package:flutter/material.dart';
-// import 'dart:math';
-
-// @RoutePage()
-// class CallScreen extends StatefulWidget {
-//   const CallScreen({Key? key}) : super(key: key);
-
-//   @override
-//   _CallScreenState createState() => _CallScreenState();
-// }
-
-// class _CallScreenState extends State<CallScreen>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _controller;
-
-//   @override
-//   initState() {
-//     super.initState();
-//     _controller = AnimationController(
-//       vsync: this,
-//       duration: Duration(seconds: 2),
-//     )..repeat();
-//   }
-
-//   @override
-//   void dispose() {
-//     // TODO: implement dispose
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return AnimatedBuilder(
-//       animation: _controller,
-//       builder: (context, child) {
-//         return CustomPaint(
-//           painter: WavePainter(_controller.value),
-//           child: Center(
-//             child: Icon(
-//               Icons.call,
-//               size: 50,
-//               color: Colors.greenAccent,
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class WavePainter extends CustomPainter {
-//   final double progress;
-
-//   WavePainter(this.progress);
-
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final Paint paint = Paint()
-//       ..color = Colors.greenAccent.withOpacity(1 - progress)
-//       ..style = PaintingStyle.stroke
-//       ..strokeWidth = 4.0;
-
-//     final double maxRadius = min(size.width, size.height) * 0.4;
-
-//     // canvas.drawLine(Offset, p2, paint)
-//     var path = Path();
-//     for (int i = -180; i <= 180; i++) {
-//       path.lineTo(
-//         i.toDouble() + size.width / 2,
-//         -sin(i * 0.017) * size.height / 2 + size.height / 2,
-//       );
-//     }
-
-//     canvas.drawPath(path, paint);
-//     // Draw expanding circles
-//     for (int i = 0; i < 3; i++) {
-//       final double radius = maxRadius * (progress - (i * 0.33)).clamp(0.0, 1.0);
-//       if (radius > 0) {
-//         canvas.drawCircle(
-//           size.center(Offset.zero),
-//           radius,
-//           paint..color = paint.color.withOpacity(1 - (progress - (i * 0.33))),
-//         );
-//       }
-//     }
-//   }
-
-//   @override
-//   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-// }
-
-// ignore_for_file: use_super_parameters, library_private_types_in_public_api, prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last
-
 import 'package:auto_route/auto_route.dart';
 import 'package:myfriendfaith/core/routes/app_route.gr.dart';
 import 'package:myfriendfaith/widgets/hamburger_menu.dart';
@@ -120,6 +25,7 @@ class _CallScreenState extends State<CallScreen>
     _controller =
         AnimationController(vsync: this, duration: Duration(seconds: 3))
           ..repeat(reverse: true);
+    // _initSpeech();
   }
 
   @override
@@ -208,7 +114,7 @@ class _CallScreenState extends State<CallScreen>
                 children: [
                   IconButton(
                       onPressed: () {
-                        this._controller.stop(canceled: true);
+                        // context.router.push(CallTestScreen());
                       },
                       style: ButtonStyle(
                           backgroundColor:

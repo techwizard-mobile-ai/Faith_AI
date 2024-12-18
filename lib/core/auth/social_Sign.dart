@@ -18,7 +18,7 @@ Future<void> signInFirebaseWithCredential(OAuthCredential credential,
     } else {
       print("User Signed In with social");
     }
-    if (photoURL != null) {
+    if (photoURL != null && user.photoURL == null) {
       user.updatePhotoURL(photoURL);
     }
     context!.router.push(DashboardScreen(displayName: user.displayName));

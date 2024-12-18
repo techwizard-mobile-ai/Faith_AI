@@ -24,6 +24,7 @@ class _ProfileModalState extends State<ProfileModal> {
   User? user;
   bool isEditing = false;
   File? imageFile;
+  bool isUpdating = false;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -47,10 +48,11 @@ class _ProfileModalState extends State<ProfileModal> {
 //Upload Profile image and update the photoURL of the firebase authentication
   Future<void> updateProfile(BuildContext context) async {
     String? imageURL;
+    setState(() {
+      isUpdating = true;
+    });
 
-    print("ONE");
     if (imageFile != null && user != null) {
-      print("Image One");
       imageURL = await uploadAvatar(imageFile, user?.uid ?? '');
       if (imageURL != null) {
         user?.updatePhotoURL(imageURL);
@@ -60,10 +62,8 @@ class _ProfileModalState extends State<ProfileModal> {
       }
     }
     if (user != null) {
-      print("DisplayName");
       await user?.updateDisplayName(_nameController.text);
       if (_passwordController.text.isNotEmpty) {
-        print("Password");
         await user?.updatePassword(_passwordController.text);
       }
       await user?.reload();
@@ -72,6 +72,7 @@ class _ProfileModalState extends State<ProfileModal> {
 
     setState(() {
       this.isEditing = false;
+      this.isUpdating = false;
     });
   }
 
@@ -150,19 +151,26 @@ class _ProfileModalState extends State<ProfileModal> {
                           ),
                           Row(
                             children: [
-                              IconButton(
-                                  onPressed: () {
-                                    handleEdit_Save();
-                                  },
-                                  icon: Icon(this.isEditing
-                                      ? Icons.check
-                                      : Icons.edit_note_rounded),
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                        Colors.transparent),
-                                    foregroundColor:
-                                        WidgetStateProperty.all(Colors.white),
-                                  )),
+                              this.isUpdating
+                                  ? CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 3,
+                                    )
+                                  : IconButton(
+                                      onPressed: () {
+                                        handleEdit_Save();
+                                      },
+                                      icon: Icon(this.isEditing
+                                          ? Icons.check
+                                          : Icons.edit_note_rounded),
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            WidgetStateProperty.all(
+                                                Colors.transparent),
+                                        foregroundColor:
+                                            WidgetStateProperty.all(
+                                                Colors.white),
+                                      )),
                             ],
                           ),
                         ],

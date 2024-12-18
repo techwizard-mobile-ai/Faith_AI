@@ -18,6 +18,9 @@ class _CurrentTimeState extends State<CurrentTime> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    DateTime now = DateTime.now();
+    _current =
+        '${(now.hour % 12).toString()} : ${now.minute.toString()} ${now.hour / 12 >= 1 ? "PM" : "AM"}';
 
     _currentTimer = Timer.periodic(Duration(minutes: 1), (timer) {
       DateTime now = DateTime.now();

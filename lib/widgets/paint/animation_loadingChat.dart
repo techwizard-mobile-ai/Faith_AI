@@ -16,8 +16,10 @@ class _AnimationLoadingChatState extends State<AnimationLoadingChat>
 
   Future<void> startAnimation() async {
     await Future.delayed(Duration(milliseconds: widget.duration));
-    _controller.repeat(reverse: true);
-    // _controller.forward();
+    if (mounted) {
+      _controller.repeat(reverse: true);
+      // _controller.forward();
+    }
   }
 
   @override
@@ -31,7 +33,6 @@ class _AnimationLoadingChatState extends State<AnimationLoadingChat>
 
   @override
   void dispose() {
-    _controller.stop();
     _controller.dispose();
     // TODO: implement dispose
     super.dispose();
