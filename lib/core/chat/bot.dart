@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:cloud_functions/cloud_functions.dart';
 
 Future<String> sendToBot(
   String message,
@@ -36,4 +37,10 @@ Future<String> sendToBot(
     print("Error communicating with Claude: $e");
     return e.toString();
   }
+}
+
+Future<void> testCloudFunction() async {
+  final HttpsCallable callable =
+      FirebaseFunctions.instance.httpsCallable('helloWorld');
+  final response = await callable.call();
 }

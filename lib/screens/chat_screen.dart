@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, library_private_types_in_public_api, use_super_parameters
 
 import 'package:auto_route/auto_route.dart';
+import 'package:myfriendfaith/core/chat/bot.dart';
 import 'package:myfriendfaith/core/chat/firestore.dart';
 import 'package:myfriendfaith/core/chat/index.dart';
 // import 'package:myfriendfaith/core/routes/app_route.gr.dart';
@@ -96,6 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   initState() {
     getHistory();
+    testCloudFunction();
   }
 
   @override
