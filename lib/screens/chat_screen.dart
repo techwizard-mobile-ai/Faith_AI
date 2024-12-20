@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, library_private_types_in_public_api, use_super_parameters
 
 import 'package:auto_route/auto_route.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myfriendfaith/core/chat/bot.dart';
 import 'package:myfriendfaith/core/chat/firestore.dart';
 import 'package:myfriendfaith/core/chat/index.dart';
@@ -28,6 +29,7 @@ class _ChatScreenState extends State<ChatScreen> {
   //Here is the State of this screen
   //_controller is for the controlling of the message text field.
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   final String apiKey = dotenv.env['API_KEY']!;
   final String baseURL = dotenv.env['BOT_BASE_URL']!;
@@ -43,14 +45,30 @@ class _ChatScreenState extends State<ChatScreen> {
         });
         isWaiting = true;
       });
-      Map<String, dynamic>? response =
-          await sendMessage(_controller.text, hid, apiKey, baseURL);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOut,
+        );
+      });
+      String tempReq = _controller.text;
       _controller.clear();
-      print(response);
+      print(hid);
+      Map<String, dynamic>? response = await sendMessage(tempReq, hid, apiKey,
+          baseURL, FirebaseAuth.instance.currentUser?.uid);
       messages.add(response!);
       setState(() {
         isWaiting = false;
         hid ??= response['historyId'];
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
       });
     }
   }
@@ -97,7 +115,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   initState() {
     getHistory();
-    testCloudFunction();
   }
 
   @override
@@ -106,21 +123,6 @@ class _ChatScreenState extends State<ChatScreen> {
     // Make sure to dispose of the controller when not needed
     super.dispose();
   }
-
-  List<String> botMessages = [
-    "Hello, how can I help you today?",
-    "I'm having trouble with my account.",
-    "Sure, I can assist you with that.",
-    "I'm sorry to hear that. Let me guide you through the process.",
-    "Thank you for your assistance. Have a great day!",
-  ];
-
-  List<String> userMessages = [
-    "Hi, I need help with my account.",
-    "I'm having trouble with my account.",
-    "I'm sorry to hear that. Let me guide you through the process.",
-    "Thank you for your assistance. Have a great day!",
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +146,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 Expanded(
                     child: SingleChildScrollView(
+                  controller: _scrollController,
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   child: Column(
                     children: [

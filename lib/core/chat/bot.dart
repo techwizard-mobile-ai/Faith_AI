@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:cloud_functions/cloud_functions.dart';
 
 Future<String> sendToBot(
   String message,
@@ -39,8 +38,28 @@ Future<String> sendToBot(
   }
 }
 
+//Send Request Via Cloud Function
+Future<String> sendToCloudFunction(String msg, String? uid, String? hid) async {
+  print(hid);
+  print(hid == null);
+  try {
+    final response = await http.post(
+        Uri.parse("https:\/\/chat-nulrzzis2a-uc.a.run.app"),
+        body: {"text": msg, "first": '${hid == null}', "id": uid});
+    print(response.statusCode);
+    return response.body;
+  } catch (e) {
+    print("Error communicating with Claude: $e");
+    return e.toString();
+  }
+}
+
+//Test Cloud Function
 Future<void> testCloudFunction() async {
-  final HttpsCallable callable =
-      FirebaseFunctions.instance.httpsCallable('helloWorld');
-  final response = await callable.call();
+  try {
+    final response = await http.post(
+        Uri.parse("https:\/\/testbot-nulrzzis2a-uc.a.run.app\/"),
+        body: {"text": "I am new Here, what do i have to do"});
+    print(response.body);
+  } catch (e) {}
 }
