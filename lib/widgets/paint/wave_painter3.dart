@@ -5,7 +5,9 @@ import 'dart:core';
 import 'dart:ui';
 
 class WaveAnimationWidgetThree extends StatefulWidget {
-  const WaveAnimationWidgetThree({Key? key}) : super(key: key);
+  final botSaying;
+  const WaveAnimationWidgetThree({Key? key, required this.botSaying})
+      : super(key: key);
 
   @override
   _WaveAnimationWidgetThreeState createState() =>
@@ -43,7 +45,7 @@ class _WaveAnimationWidgetThreeState extends State<WaveAnimationWidgetThree>
               MediaQuery.of(context)
                   .size
                   .height), // Set the desired size of the wave
-          painter: WavePainter2(_controller.value),
+          painter: WavePainter2(_controller.value, widget.botSaying),
         );
       },
     );
@@ -52,7 +54,8 @@ class _WaveAnimationWidgetThreeState extends State<WaveAnimationWidgetThree>
 
 class WavePainter2 extends CustomPainter {
   final double progress;
-  WavePainter2(this.progress);
+  final bool botSaying;
+  WavePainter2(this.progress, this.botSaying);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -88,7 +91,7 @@ class WavePainter2 extends CustomPainter {
     // Create wave pattern by repeating sine waves
     for (double x = 0; x <= size.width; x++) {
       final sine = (sin(2 * pi * x / waveLength * (progress + 0.2))) *
-          50; // Sine wave formula
+          (botSaying ? 200 : 50); // Sine wave formula
       path.lineTo(x, size.height / 2 + (1 - progress) * sine + 50);
       npath.lineTo(x, size.height / 2 + (1 - progress) * sine + 50);
     }

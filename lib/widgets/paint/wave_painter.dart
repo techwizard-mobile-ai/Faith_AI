@@ -5,7 +5,9 @@ import 'dart:core';
 import 'dart:ui';
 
 class WaveAnimationWidgetOne extends StatefulWidget {
-  const WaveAnimationWidgetOne({Key? key}) : super(key: key);
+  final botSaying;
+  const WaveAnimationWidgetOne({Key? key, required this.botSaying})
+      : super(key: key);
 
   @override
   _WaveAnimationWidgetOneState createState() => _WaveAnimationWidgetOneState();
@@ -22,6 +24,7 @@ class _WaveAnimationWidgetOneState extends State<WaveAnimationWidgetOne>
       vsync: this,
       duration: Duration(seconds: 5),
     )..repeat(reverse: true);
+    print(widget.botSaying);
   }
 
   @override
@@ -42,7 +45,7 @@ class _WaveAnimationWidgetOneState extends State<WaveAnimationWidgetOne>
               MediaQuery.of(context)
                   .size
                   .height), // Set the desired size of the wave
-          painter: WavePainter(_controller.value),
+          painter: WavePainter(_controller.value, widget.botSaying),
         );
       },
     );
@@ -51,7 +54,8 @@ class _WaveAnimationWidgetOneState extends State<WaveAnimationWidgetOne>
 
 class WavePainter extends CustomPainter {
   final double progress;
-  WavePainter(this.progress);
+  final bool botSaying;
+  WavePainter(this.progress, this.botSaying);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -86,8 +90,8 @@ class WavePainter extends CustomPainter {
 
     // Create wave pattern by repeating sine waves
     for (double x = 0; x <= size.width; x++) {
-      final sine =
-          (sin(2 * pi * x / waveLength + 0.3 * pi)) * 100; // Sine wave formula
+      final sine = (sin(2 * pi * x / waveLength + 0.3 * pi)) *
+          (botSaying ? 250 : 100); // Sine wave formula
       path.lineTo(x, size.height / 2 + (0.5 - progress) * sine + 50);
       npath.lineTo(x, size.height / 2 + (0.5 - progress) * sine + 50);
     }

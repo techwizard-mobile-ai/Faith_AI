@@ -1,4 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:myfriendfaith/core/call/index.dart';
+import 'package:myfriendfaith/core/call/stt.dart';
 import 'package:myfriendfaith/core/routes/app_route.gr.dart';
 import 'package:myfriendfaith/widgets/hamburger_menu.dart';
 import 'package:myfriendfaith/widgets/paint/wave_painter2.dart';
@@ -6,6 +13,11 @@ import 'package:myfriendfaith/widgets/paint/wave_painter3.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:myfriendfaith/widgets/paint/wave_painter.dart';
+
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 @RoutePage()
 class CallScreen extends StatefulWidget {
@@ -19,6 +31,37 @@ class _CallScreenState extends State<CallScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
+  bool _isBotSaying = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // late StreamSink<Uint8List> _audioStreamSink;
+  final FlutterSoundPlayer _player = FlutterSoundPlayer();
+  Uint8List voiceData = Uint8List(0);
+
+  late CustomSTT sttCore;
+
+  Future<void> _checkPermissions() async {
+    final microphonePermission = await Permission.microphone.request();
+    if (!microphonePermission.isGranted) {
+      // Handle permission denied case
+      print("Microphone permission is not granted!");
+    }
+  }
+
+  Future<void> _testBotVoice() async {
+    final audiostrem = await callToBot(null);
+    // await _audioPlayer.setAudioSource(
+    //   AudioSource.uri(Uri.dataFromBytes(audiostrem)),
+    // );
+    // _audioPlayer.play();
+    setState(() {
+      _isBotSaying = true;
+    });
+    await _audioPlayer.setSourceBytes(audiostrem);
+
+    await _audioPlayer.resume();
+  }
+
   @override
   initState() {
     super.initState();
@@ -26,6 +69,14 @@ class _CallScreenState extends State<CallScreen>
         AnimationController(vsync: this, duration: Duration(seconds: 3))
           ..repeat(reverse: true);
     // _initSpeech();
+    _audioPlayer.onPlayerComplete.listen((event) {
+      setState(() {
+        _isBotSaying = false;
+      });
+    });
+
+    sttCore = CustomSTT();
+    sttCore.startRecording();
   }
 
   @override
@@ -43,9 +94,15 @@ class _CallScreenState extends State<CallScreen>
           './assets/images/landing-bg.png', // Path to your SVG
           fit: BoxFit.cover, // Cover the entire container
         ),
-        WaveAnimationWidgetOne(),
-        WaveAnimationWidget(),
-        WaveAnimationWidgetThree(),
+        WaveAnimationWidgetOne(
+          botSaying: _isBotSaying,
+        ),
+        WaveAnimationWidget(
+          botSaying: _isBotSaying,
+        ),
+        WaveAnimationWidgetThree(
+          botSaying: _isBotSaying,
+        ),
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,9 +170,7 @@ class _CallScreenState extends State<CallScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                      onPressed: () {
-                        // context.router.push(CallTestScreen());
-                      },
+                      onPressed: () {},
                       style: ButtonStyle(
                           backgroundColor:
                               WidgetStateProperty.all(Color(0x1AFFFFFF)),
