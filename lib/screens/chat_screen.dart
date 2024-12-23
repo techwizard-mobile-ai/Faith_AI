@@ -2,10 +2,8 @@
 
 import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:myfriendfaith/core/chat/bot.dart';
 import 'package:myfriendfaith/core/chat/firestore.dart';
 import 'package:myfriendfaith/core/chat/index.dart';
-// import 'package:myfriendfaith/core/routes/app_route.gr.dart';
 import 'package:myfriendfaith/widgets/chat_item.dart';
 import 'package:myfriendfaith/widgets/current_time.dart';
 import 'package:myfriendfaith/widgets/hamburger_menu.dart';
@@ -16,7 +14,8 @@ import 'package:myfriendfaith/widgets/paint/animation_loadingChat.dart';
 
 @RoutePage()
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  String? historyId;
+  ChatScreen({Key? key, this.historyId}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -55,8 +54,8 @@ class _ChatScreenState extends State<ChatScreen> {
       });
       String tempReq = _controller.text;
       _controller.clear();
-      print(hid);
-      Map<String, dynamic>? response = await sendMessage(tempReq, hid, apiKey,
+      print(messages.last);
+      Map<String, dynamic>? response = await sendMessage(messages, hid, apiKey,
           baseURL, FirebaseAuth.instance.currentUser?.uid);
       messages.add(response!);
       setState(() {
@@ -77,8 +76,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> getHistory() async {
     List<Map<String, dynamic>>? histories = await readHistory(hid);
     if (histories != null && histories.isNotEmpty) {
+      histories = histories.map((item) {
+        return {
+          'isBot': item['isBot'],
+          'messages': item['messages'],
+          'historyId': item['historyId']
+        };
+      }).toList();
+      print(histories);
       setState(() {
-        messages = histories;
+        messages = histories!;
         isWaiting = false;
         hid = histories[0]['historyId'];
       });
@@ -114,6 +121,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   initState() {
+    hid = widget.historyId;
     getHistory();
   }
 

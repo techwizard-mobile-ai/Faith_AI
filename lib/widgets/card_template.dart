@@ -2,13 +2,19 @@
 
 import 'package:myfriendfaith/widgets/journal_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CardTemplate extends StatefulWidget {
   final int index;
+  final List<Map<String, dynamic>> journal;
+  final String title;
   void Function(int) openModal;
-  CardTemplate({Key? key, required this.index, required this.openModal})
+  CardTemplate(
+      {Key? key,
+      required this.index,
+      required this.openModal,
+      required this.journal,
+      required this.title})
       : super(key: key);
 
   @override
@@ -43,7 +49,7 @@ class _CardTemplateState extends State<CardTemplate> {
           children: [
             Container(
               margin: EdgeInsets.only(bottom: 8),
-              child: Text('Today\'s Highlights',
+              child: Text(this.widget.title,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -53,13 +59,15 @@ class _CardTemplateState extends State<CardTemplate> {
                       fontFamily: 'Georgia')),
             ),
             Column(
-                children: [1, 2, 3, 4, 5].map((index) {
+                children: widget.journal.asMap().entries.map((entry) {
+              final document = entry.value;
               return JournalItem(
                 stackKey: _stackKey,
-                index: this.widget.index + index,
+                index: this.widget.index + entry.key + 1,
                 openModal: (int index) {
                   this.widget.openModal(index);
                 },
+                data: document,
               );
             }).toList())
           ],

@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, library_private_types_in_public_api, use_super_parameters, sort_child_properties_last
 
 import 'package:auto_route/auto_route.dart';
+import 'package:myfriendfaith/core/journal/index.dart';
 import 'package:myfriendfaith/widgets/card_template.dart';
 import 'package:myfriendfaith/widgets/filter_item.dart';
 import 'package:myfriendfaith/widgets/hamburger_menu.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,7 @@ class JournalScreen extends StatefulWidget {
 class _JournalScreenState extends State<JournalScreen> {
   //Here is for the Modal flag
   int activeIndex = 0;
+  Map<String, List<Map<String, dynamic>>>? journals;
 
   //Here is the modal flag handler
   void handleModal(int index) {
@@ -31,8 +34,24 @@ class _JournalScreenState extends State<JournalScreen> {
     print((activeIndex / 5).floor());
   }
 
+  //Get the Histories
+  Future<void> _getJournalLists() async {
+    final journals = await readJournal();
+    setState(() {
+      this.journals = journals;
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getJournalLists();
+  }
+
   @override
   Widget build(BuildContext context) {
+    int index = 0;
     return Scaffold(
       body: Container(
         child: Stack(
@@ -160,18 +179,33 @@ class _JournalScreenState extends State<JournalScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 15),
                   child: Stack(children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CardTemplate(
-                          index: 0,
-                          openModal: this.handleModal,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: journals != null
+                            ? journals!.entries.map((entry) {
+                                index += entry.value.length;
+                                return CardTemplate(
+                                    index: index - entry.value.length,
+                                    openModal: this.handleModal,
+                                    journal: entry.value,
+                                    title: entry.key);
+                              }).toList()
+                            : [
+                                CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 5,
+                                )
+                              ]
+                        // [
+                        //   CardTemplate(
+                        //     index: 0,
+                        //     openModal: this.handleModal,
+                        //   ),
+                        //   CardTemplate(
+                        //     index: 5,
+                        //     openModal: this.handleModal,
+                        //   ),
+                        // ],
                         ),
-                        CardTemplate(
-                          index: 5,
-                          openModal: this.handleModal,
-                        ),
-                      ],
-                    ),
                     activeIndex > 0
                         ? Positioned(
                             top: activeIndex == 10

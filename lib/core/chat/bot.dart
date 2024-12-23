@@ -39,18 +39,20 @@ Future<String> sendToBot(
 }
 
 //Send Request Via Cloud Function
-Future<String> sendToCloudFunction(String msg, String? uid, String? hid) async {
-  print(hid);
-  print(hid == null);
+Future<Map<String, dynamic>> sendToCloudFunction(
+    List<Map<String, dynamic>> msg, String? uid, String? hid) async {
   try {
-    final response = await http.post(
-        Uri.parse("https:\/\/chat-nulrzzis2a-uc.a.run.app"),
-        body: {"text": msg, "first": '${hid == null}', "id": uid});
-    print(response.statusCode);
-    return response.body;
+    final response = await http
+        .post(Uri.parse("https:\/\/chat-nulrzzis2a-uc.a.run.app"), body: {
+      "messages": jsonEncode(msg),
+      "first": '${hid == null}',
+      "id": uid
+    });
+    final _response = json.decode(response.body.toString());
+    return _response;
   } catch (e) {
     print("Error communicating with Claude: $e");
-    return e.toString();
+    return {"error": e.toString()};
   }
 }
 

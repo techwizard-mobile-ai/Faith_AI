@@ -78,3 +78,14 @@ Future<List<Map<String, dynamic>>?> readHistory(String? hid) async {
     }
   }
 }
+
+Future<bool> deleteHistory(String hid) async {
+  final _store = FirebaseFirestore.instance;
+  try {
+    await _store.collection("topic").doc(hid).delete();
+    return true;
+  } catch (e) {
+    print(e);
+    return false;
+  }
+}

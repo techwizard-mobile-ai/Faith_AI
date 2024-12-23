@@ -127,7 +127,7 @@ class _CallScreenState extends State<CallScreen>
                   ),
                   IconButton(
                       onPressed: () {
-                        context.router.push(ChatScreen());
+                        context.router.push(ChatScreen(historyId: null));
                       },
                       style: ButtonStyle(
                           backgroundColor:
