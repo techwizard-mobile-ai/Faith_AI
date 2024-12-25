@@ -1,4 +1,5 @@
 import "dart:async";
+import "dart:isolate";
 import "dart:typed_data";
 import "dart:convert";
 import "dart:io";
@@ -8,15 +9,23 @@ import 'package:permission_handler/permission_handler.dart';
 
 class CustomSTT {
   bool _isRecording = true;
+  bool _isThinking = false;
   DateTime? currentTime = DateTime.now();
   DateTime? _voiceEndTime = DateTime.now();
-  double _voiceThreshold = 110; // Amplitude threshold for detecting voice
-  Uint8List voiceData = Uint8List(0);
+  int _voiceThreshold = 110; // Amplitude threshold for detecting voice
+  BytesBuilder voiceData = BytesBuilder();
+  Function() setBotSaying;
+  Function(String msg) sayToBot;
 
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   late StreamController<Uint8List> _audioStreamController;
 
-  CustomSTT();
+  CustomSTT(this.setBotSaying, this.sayToBot);
+
+  //Start Recording
+  //1.Check the User is speaking or not, with threshhold
+  //2. Send to the Google STT
+  //3. Get the Response of it.
   Future<void> startRecording() async {
     try {
       _audioStreamController = StreamController<Uint8List>();
@@ -26,31 +35,33 @@ class CustomSTT {
         await _recorder.openRecorder();
         await _recorder.startRecorder(
             toStream: _audioStreamController.sink, codec: Codec.pcm16);
-        _audioStreamController.stream.listen((data) {
-          double amplitude = _calculateAmplitude(data);
-          if (amplitude > _voiceThreshold) {
+        _audioStreamController.stream.listen((data) async {
+          if (_isThinking) return;
+          if (data.indexOf(_voiceThreshold) >= 0) {
             if (!_isRecording) {
               this._isRecording = true;
             }
             if (_isRecording) {
-              voiceData = Uint8List.fromList(voiceData + data);
+              voiceData.add(data);
               _voiceEndTime = DateTime.now();
               return;
             }
           } else {
             if (_isRecording &&
-                _voiceEndTime!.difference(currentTime!).inSeconds.abs() < 2) {
+                _voiceEndTime!.difference(currentTime!).inMilliseconds.abs() <
+                    1000) {
               this._isRecording = false;
             }
           }
           currentTime = DateTime.now();
 
-          if (!_isRecording &&
+          if ((!_isRecording &&
               _voiceEndTime!.difference(currentTime!).inMilliseconds.abs() >=
-                  2000) {
+                  2000)) {
             this._isRecording = true;
-            print("Sending to Google");
-            _sendToGoogleSTT(voiceData);
+            this._isThinking = true;
+            this.setBotSaying();
+            _sendToGoogleSTT(voiceData.toBytes());
           }
         });
       } else
@@ -61,14 +72,7 @@ class CustomSTT {
     }
   }
 
-  double _calculateAmplitude(Uint8List audioData) {
-    double sum = 0;
-    for (int i = 0; i < audioData.length; i++) {
-      sum += audioData[i];
-    }
-    return sum / audioData.length; // Average amplitude
-  }
-
+//For Translate my voice
   Future<void> _sendToGoogleSTT(Uint8List audioData) async {
     print("Sending Sound");
     String base64Audio = base64Encode(audioData);
@@ -90,9 +94,28 @@ class CustomSTT {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestBody));
     if (response.statusCode == 200) {
-      print(response.body);
+      final decodedRes = json.decode(response.body);
+      String duration = decodedRes['totalBilledTime']
+          .substring(0, decodedRes['totalBilledTime'].length - 1);
+      if (int.parse(duration) > 0) {
+        if (decodedRes['results'] != null &&
+            decodedRes['results'][0]['alternatives'][0]["transcript"] != null) {
+          print("Get the Translated my Voice");
+          this.setBotSaying();
+          this.sayToBot(
+              decodedRes['results'][0]['alternatives'][0]["transcript"]);
+        }
+      }
     } else
       print("Failt to STT");
-    voiceData = Uint8List(0);
+    this._isThinking = false;
+    // this.setBotSaying();
+    voiceData = BytesBuilder();
+  }
+
+  Future<void> stopRecording() async {
+    await _recorder.stopRecorder();
+    await _recorder.closeRecorder();
+    _audioStreamController.close();
   }
 }

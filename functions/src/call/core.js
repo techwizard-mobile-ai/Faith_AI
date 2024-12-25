@@ -7,16 +7,22 @@ const getVoiceLists = async () => {
   return voices;
 };
 
-const createMessage = async () => {
+const createMessage = async (msg) => {
   const client = await createClient();
-  const audio = await client.generate({
-    stream: true,
-    voice: "Sarah",
-    text: "Hi Nice to meet you, this is for testing bot, so just say loudly and long.Hi Nice to meet you, this is for testing bot, so just say loudly and long.Hi Nice to meet you, this is for testing bot, so just say loudly and long.Hi Nice to meet you, this is for testing bot, so just say loudly and long.Hi Nice to meet you, this is for testing bot, so just say loudly and long.Hi Nice to meet you, this is for testing bot, so just say loudly and long.",
-    model_id: "eleven_multilingual_v2",
-  });
-  logger.info(audio);
-  return audio;
+  try {
+    logger.info(msg);
+    const audio = await client.generate({
+      stream: true,
+      voice: "Sarah",
+      text: msg,
+      model_id: "eleven_multilingual_v2",
+    });
+    logger.info(audio);
+    return audio;
+  } catch (e) {
+    logger.error(e);
+    return null;
+  }
 };
 
 module.exports = {

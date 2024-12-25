@@ -63,7 +63,7 @@ class WavePainter2 extends CustomPainter {
       ..style = PaintingStyle.fill;
     paint.shader = LinearGradient(
       colors: [
-        Colors.white.withOpacity(0.4), // Top of the wave
+        Colors.white.withOpacity(0.6), // Top of the wave
         Colors.white.withOpacity(0), // Bottom of the wave
       ],
       begin: Alignment.topCenter,

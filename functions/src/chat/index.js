@@ -1,10 +1,10 @@
-const {onRequest} = require("firebase-functions/v2/https");
+const {onRequest, onCall} = require("firebase-functions/v2/https");
 // const logger = require("firebase-functions/logger");
 const {firstChat, sendRequest} = require("./utils");
 const {logger} = require("firebase-functions");
 const {CHRISTIAN_PROMPT} = require("./prompts");
 exports.chat = onRequest(async (req, res) => {
-  logger.info(typeof req.body.messages);
+  logger.info("Here is my Custom Logo");
   let messages;
   if (req.body.messages != null) {
     messages = JSON.parse(req.body.messages).map((message) => {
@@ -35,4 +35,9 @@ exports.chat = onRequest(async (req, res) => {
           res.status(500).send(e);
         });
   }
+});
+
+exports.callChat = onCall(async (req, res) => {
+  const {messages} = req.data;
+  return {message: messages};
 });

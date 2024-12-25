@@ -10,6 +10,7 @@ import 'firebase_options.dart';
 
 //For the Use of the dot_env
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,8 @@ Future<void> main() async {
   );
   await Hive.initFlutter();
   await Hive.openBox('myBox');
+
+  // Ensure that BackgroundIsolateBinaryMessenger is initialized
   runApp(MyApp());
 }
 
